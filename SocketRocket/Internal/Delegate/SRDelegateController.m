@@ -46,10 +46,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setDelegate:(id<SRWebSocketDelegate> _Nullable)delegate
 {
+    __weak typeof(self) weakself = self;
     dispatch_barrier_async(self.accessQueue, ^{
-        _delegate = delegate;
+        typeof(self) strongSelf = weakself;
+        strongSelf->_delegate = delegate;
 
-        self.availableDelegateMethods = (SRDelegateAvailableMethods){
+        strongSelf.availableDelegateMethods = (SRDelegateAvailableMethods){
             .didReceiveMessage = [delegate respondsToSelector:@selector(webSocket:didReceiveMessage:)],
             .didReceiveMessageWithString = [delegate respondsToSelector:@selector(webSocket:didReceiveMessageWithString:)],
             .didReceiveMessageWithData = [delegate respondsToSelector:@selector(webSocket:didReceiveMessageWithData:)],
@@ -74,9 +76,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setDispatchQueue:(dispatch_queue_t _Nullable)queue
 {
+    __weak typeof(self) weakself = self;
     dispatch_barrier_async(self.accessQueue, ^{
-        _dispatchQueue = queue ?: dispatch_get_main_queue();
-        _operationQueue = nil;
+        typeof(self) strongSelf = weakself;
+        strongSelf->_dispatchQueue = queue ?: dispatch_get_main_queue();
+        strongSelf->_operationQueue = nil;
     });
 }
 
@@ -91,9 +95,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setOperationQueue:(NSOperationQueue *_Nullable)queue
 {
+    __weak typeof(self) weakself = self;
     dispatch_barrier_async(self.accessQueue, ^{
-        _dispatchQueue = queue ? nil : dispatch_get_main_queue();
-        _operationQueue = queue;
+        typeof(self) strongSelf = weakself;
+        strongSelf->_dispatchQueue = queue ? nil : dispatch_get_main_queue();
+        strongSelf->_operationQueue = queue;
     });
 }
 

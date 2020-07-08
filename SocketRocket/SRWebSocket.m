@@ -343,15 +343,18 @@ NSString *const SRHTTPResponseErrorKey = @"HTTPResponseStatusCode";
         // If we don't require SSL validation - consider that we connected.
         // Otherwise `didConnect` is called when SSL validation finishes.
         if (!_requestRequiresSSL) {
+            __weak typeof(self) weakself = self;
             dispatch_async(_workQueue, ^{
-                [self didConnect];
+                typeof(self) strongSelf = weakself;
+                [strongSelf didConnect];
             });
         }
     }
     // Schedule to run on a work queue, to make sure we don't run this inline and deallocate `self` inside `SRProxyConnect`.
     // TODO: (nlutsenko) Find a better structure for this, maybe Bolts Tasks?
+    
     dispatch_async(_workQueue, ^{
-        _proxyConnect = nil;
+        self->_proxyConnect = nil;
     });
 }
 
@@ -418,15 +421,19 @@ NSString *const SRHTTPResponseErrorKey = @"HTTPResponseStatusCode";
     if (_receivedHTTPHeaders == NULL) {
         _receivedHTTPHeaders = CFHTTPMessageCreateEmpty(NULL, NO);
     }
-
+    
+    __weak typeof(self) weakself = self;
     [self _readUntilHeaderCompleteWithCallback:^(SRWebSocket *socket,  NSData *data) {
-        CFHTTPMessageAppendBytes(_receivedHTTPHeaders, (const UInt8 *)data.bytes, data.length);
+        typeof(self) strongSelf = weakself;
+        
+        CFHTTPMessageRef receivedHTTPHeaders = strongSelf->_receivedHTTPHeaders;
+        CFHTTPMessageAppendBytes(receivedHTTPHeaders, (const UInt8 *)data.bytes, data.length);
 
-        if (CFHTTPMessageIsHeaderComplete(_receivedHTTPHeaders)) {
-            SRDebugLog(@"Finished reading headers %@", CFBridgingRelease(CFHTTPMessageCopyAllHeaderFields(_receivedHTTPHeaders)));
-            [self _HTTPHeadersDidFinish];
+        if (CFHTTPMessageIsHeaderComplete(receivedHTTPHeaders)) {
+            SRDebugLog(@"Finished reading headers %@", CFBridgingRelease(CFHTTPMessageCopyAllHeaderFields(receivedHTTPHeaders)));
+            [strongSelf _HTTPHeadersDidFinish];
         } else {
-            [self _readHTTPHeader];
+            [strongSelf _readHTTPHeader];
         }
     }];
 }
@@ -536,32 +543,41 @@ NSString *const SRHTTPResponseErrorKey = @"HTTPResponseStatusCode";
 
 - (void)_closeWithProtocolError:(NSString *)message;
 {
+    __weak typeof(self) weakself = self;
     // Need to shunt this on the _callbackQueue first to see if they received any messages
     [self.delegateController performDelegateQueueBlock:^{
-        [self closeWithCode:SRStatusCodeProtocolError reason:message];
-        dispatch_async(_workQueue, ^{
-            [self closeConnection];
+        typeof(self) strongSelf = weakself;
+        
+        __weak typeof(self) weakself_ = strongSelf;
+        [strongSelf closeWithCode:SRStatusCodeProtocolError reason:message];
+        dispatch_async(strongSelf->_workQueue, ^{
+            typeof(self) strongSelf_ = weakself_;
+            [strongSelf_ closeConnection];
         });
     }];
 }
 
 - (void)_failWithError:(NSError *)error;
 {
+    __weak typeof(self) weakself = self;
     dispatch_async(_workQueue, ^{
-        if (self.readyState != SR_CLOSED) {
-            _failed = YES;
-            [self.delegateController performDelegateBlock:^(id<SRWebSocketDelegate>  _Nullable delegate, SRDelegateAvailableMethods availableMethods) {
+        typeof(self) strongSelf = weakself;
+        if (strongSelf.readyState != SR_CLOSED) {
+            strongSelf->_failed = YES;
+            __weak typeof(self) weakself_ = self;
+            [strongSelf.delegateController performDelegateBlock:^(id<SRWebSocketDelegate>  _Nullable delegate, SRDelegateAvailableMethods availableMethods) {
+                typeof(self) strongSelf_ = weakself_;
                 if (availableMethods.didFailWithError) {
-                    [delegate webSocket:self didFailWithError:error];
+                    [delegate webSocket:strongSelf_ didFailWithError:error];
                 }
             }];
 
-            self.readyState = SR_CLOSED;
+            strongSelf.readyState = SR_CLOSED;
 
             SRDebugLog(@"Failing with error %@", error.localizedDescription);
 
-            [self closeConnection];
-            [self _scheduleCleanup];
+            [strongSelf closeConnection];
+            [strongSelf _scheduleCleanup];
         }
     });
 }
@@ -660,13 +676,17 @@ NSString *const SRHTTPResponseErrorKey = @"HTTPResponseStatusCode";
 
 - (void)_handlePingWithData:(nullable NSData *)data
 {
+    __weak typeof(self) weakself = self;
     // Need to pingpong this off _callbackQueue first to make sure messages happen in order
     [self.delegateController performDelegateBlock:^(id<SRWebSocketDelegate> _Nullable delegate, SRDelegateAvailableMethods availableMethods) {
+        typeof(self) strongSelf = weakself;
         if (availableMethods.didReceivePing) {
-            [delegate webSocket:self didReceivePingWithData:data];
+            [delegate webSocket:strongSelf didReceivePingWithData:data];
         }
-        dispatch_async(_workQueue, ^{
-            [self _sendFrameWithOpcode:SROpCodePong data:data];
+        typeof(self) weakself_ = strongSelf;
+        dispatch_async(strongSelf->_workQueue, ^{
+            typeof(self) strongSelf_ = weakself_;
+            [strongSelf_ _sendFrameWithOpcode:SROpCodePong data:data];
         });
     }];
 }
@@ -927,6 +947,7 @@ static const uint8_t SRPayloadLenMask   = 0x7F;
     assert((_currentFrameCount == 0 && _currentFrameOpcode == 0) || (_currentFrameCount > 0 && _currentFrameOpcode > 0));
 
     [self _addConsumerWithDataLength:2 callback:^(SRWebSocket *sself, NSData *data) {
+
         __block frame_header header = {0};
 
         const uint8_t *headerBuffer = data.bytes;
@@ -966,7 +987,7 @@ static const uint8_t SRPayloadLenMask   = 0x7F;
             return;
         }
 
-        size_t extra_bytes_needed = header.masked ? sizeof(_currentReadMaskKey) : 0;
+        size_t extra_bytes_needed = header.masked ? sizeof(sself->_currentReadMaskKey) : 0;
 
         if (header.payload_length == 126) {
             extra_bytes_needed += sizeof(uint16_t);
@@ -1004,7 +1025,7 @@ static const uint8_t SRPayloadLenMask   = 0x7F;
                 }
 
                 if (header.masked) {
-                    assert(mapped_size >= sizeof(_currentReadMaskOffset) + offset);
+                    assert(mapped_size >= sizeof(eself->_currentReadMaskOffset) + offset);
                     memcpy(eself->_currentReadMaskKey, ((uint8_t *)mapped_buffer) + offset, sizeof(eself->_currentReadMaskKey));
                 }
 
@@ -1016,17 +1037,19 @@ static const uint8_t SRPayloadLenMask   = 0x7F;
 
 - (void)_readFrameNew;
 {
+    __weak typeof(self) weakself = self;
     dispatch_async(_workQueue, ^{
+        typeof(self) strongSelf = weakself;
         // Don't reset the length, since Apple doesn't guarantee that this will free the memory (and in tests on
         // some platforms, it doesn't seem to, effectively causing a leak the size of the biggest frame so far).
-        _currentFrameData = [[NSMutableData alloc] init];
+        strongSelf->_currentFrameData = [[NSMutableData alloc] init];
 
-        _currentFrameOpcode = 0;
-        _currentFrameCount = 0;
-        _readOpCount = 0;
-        _currentStringScanPosition = 0;
+        strongSelf->_currentFrameOpcode = 0;
+        strongSelf->_currentFrameCount = 0;
+        strongSelf->_readOpCount = 0;
+        strongSelf->_currentStringScanPosition = 0;
 
-        [self _readFrameContinue];
+        [strongSelf _readFrameContinue];
     });
 }
 
@@ -1084,9 +1107,11 @@ static const uint8_t SRPayloadLenMask   = 0x7F;
         }
 
         if (!_failed) {
+            __weak typeof(self) weakself = self;
             [self.delegateController performDelegateBlock:^(id<SRWebSocketDelegate>  _Nullable delegate, SRDelegateAvailableMethods availableMethods) {
+                typeof(self) strongSelf = weakself;
                 if (availableMethods.didCloseWithCode) {
-                    [delegate webSocket:self didCloseWithCode:_closeCode reason:_closeReason wasClean:YES];
+                    [delegate webSocket:strongSelf didCloseWithCode:strongSelf->_closeCode reason:strongSelf->_closeReason wasClean:YES];
                 }
             }];
         }
@@ -1147,8 +1172,10 @@ static const uint8_t SRPayloadLenMask   = 0x7F;
     }
 
     // Cleanup selfRetain in the same GCD queue as usual
+    __weak typeof(self) weakself = self;
     dispatch_async(_workQueue, ^{
-        _selfRetain = nil;
+        typeof(self) strongSelf = weakself;
+        strongSelf->_selfRetain = nil;
     });
 }
 
@@ -1454,18 +1481,22 @@ static const size_t SRFrameHeaderOverhead = 32;
             if (aStream.streamError) {
                 [self _failWithError:aStream.streamError];
             } else {
+                __weak typeof(self) weakself = self;
                 dispatch_async(_workQueue, ^{
-                    if (self.readyState != SR_CLOSED) {
-                        self.readyState = SR_CLOSED;
-                        [self _scheduleCleanup];
+                    typeof(self) strongSelf = weakself;
+                    if (strongSelf.readyState != SR_CLOSED) {
+                        strongSelf.readyState = SR_CLOSED;
+                        [strongSelf _scheduleCleanup];
                     }
 
-                    if (!_sentClose && !_failed) {
-                        _sentClose = YES;
+                    if (!strongSelf->_sentClose && !strongSelf->_failed) {
+                        strongSelf->_sentClose = YES;
+                        __weak typeof(self) weakself_ = strongSelf;
                         // If we get closed in this state it's probably not clean because we should be sending this when we send messages
-                        [self.delegateController performDelegateBlock:^(id<SRWebSocketDelegate>  _Nullable delegate, SRDelegateAvailableMethods availableMethods) {
+                        [strongSelf.delegateController performDelegateBlock:^(id<SRWebSocketDelegate>  _Nullable delegate, SRDelegateAvailableMethods availableMethods) {
+                            typeof(self) strongSelf_ = weakself_;
                             if (availableMethods.didCloseWithCode) {
-                                [delegate webSocket:self
+                                [delegate webSocket:strongSelf_
                                    didCloseWithCode:SRStatusCodeGoingAway
                                              reason:@"Stream end encountered"
                                            wasClean:NO];

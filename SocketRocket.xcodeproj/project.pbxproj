@@ -957,7 +957,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastTestingUpgradeCheck = 0640;
-				LastUpgradeCheck = 1120;
+				LastUpgradeCheck = 1200;
 			};
 			buildConfigurationList = F6B208271450F597009315AF /* Build configuration list for PBXProject "SocketRocket" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1174,6 +1174,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 81D647591D2CA6A100690609 /* SocketRocket-iOS-Dynamic.xcconfig */;
 			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 			};
 			name = Debug;
@@ -1182,6 +1183,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 81D647591D2CA6A100690609 /* SocketRocket-iOS-Dynamic.xcconfig */;
 			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 			};
 			name = Release;
@@ -1192,6 +1194,7 @@
 			buildSettings = {
 				MTL_ENABLE_DEBUG_INFO = YES;
 				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 12.0;
 			};
 			name = Debug;
 		};
@@ -1201,6 +1204,7 @@
 			buildSettings = {
 				MTL_ENABLE_DEBUG_INFO = NO;
 				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 12.0;
 			};
 			name = Release;
 		};
@@ -1208,7 +1212,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 81D6475A1D2CA6A100690609 /* SocketRocket-iOS.xcconfig */;
 			buildSettings = {
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 			};
 			name = Debug;
 		};
@@ -1216,7 +1220,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 81D6475A1D2CA6A100690609 /* SocketRocket-iOS.xcconfig */;
 			buildSettings = {
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 			};
 			name = Release;
 		};
@@ -1224,6 +1228,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 81E8A69A1D4C417A00916C7E /* TestChat-iOS.xcconfig */;
 			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 			};
 			name = Debug;
 		};
@@ -1231,6 +1236,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 81E8A69A1D4C417A00916C7E /* TestChat-iOS.xcconfig */;
 			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 			};
 			name = Release;
 		};
@@ -1239,6 +1245,7 @@
 			baseConfigurationReference = 81D6475B1D2CA6A100690609 /* SocketRocket-macOS.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 			};
 			name = Debug;
 		};
@@ -1247,6 +1254,7 @@
 			baseConfigurationReference = 81D6475B1D2CA6A100690609 /* SocketRocket-macOS.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 			};
 			name = Release;
 		};
@@ -1258,6 +1266,7 @@
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -1272,6 +1281,7 @@
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -1282,7 +1292,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 81D6475D1D2CA6A100690609 /* SocketRocketTests-iOS.xcconfig */;
 			buildSettings = {
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 			};
 			name = Debug;
 		};
@@ -1290,7 +1300,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 81D6475D1D2CA6A100690609 /* SocketRocketTests-iOS.xcconfig */;
 			buildSettings = {
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 			};
 			name = Release;
 		};

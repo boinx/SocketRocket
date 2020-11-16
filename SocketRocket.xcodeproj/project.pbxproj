@@ -1244,6 +1244,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 81D6475B1D2CA6A100690609 /* SocketRocket-macOS.xcconfig */;
 			buildSettings = {
+				ARCHS = x86_64;
 				COMBINE_HIDPI_IMAGES = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 			};
@@ -1253,6 +1254,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 81D6475B1D2CA6A100690609 /* SocketRocket-macOS.xcconfig */;
 			buildSettings = {
+				ARCHS = x86_64;
 				COMBINE_HIDPI_IMAGES = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 			};

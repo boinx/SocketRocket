@@ -49,6 +49,8 @@ NS_ASSUME_NONNULL_BEGIN
     __weak typeof(self) weakself = self;
     dispatch_barrier_async(self.accessQueue, ^{
         typeof(self) strongSelf = weakself;
+		if (strongSelf == nil) { return; }
+
         strongSelf->_delegate = delegate;
 
         strongSelf.availableDelegateMethods = (SRDelegateAvailableMethods){
@@ -79,6 +81,8 @@ NS_ASSUME_NONNULL_BEGIN
     __weak typeof(self) weakself = self;
     dispatch_barrier_async(self.accessQueue, ^{
         typeof(self) strongSelf = weakself;
+		if (strongSelf == nil) { return; }
+
         strongSelf->_dispatchQueue = queue ?: dispatch_get_main_queue();
         strongSelf->_operationQueue = nil;
     });
@@ -98,6 +102,8 @@ NS_ASSUME_NONNULL_BEGIN
     __weak typeof(self) weakself = self;
     dispatch_barrier_async(self.accessQueue, ^{
         typeof(self) strongSelf = weakself;
+		if (strongSelf == nil) { return; }
+
         strongSelf->_dispatchQueue = queue ? nil : dispatch_get_main_queue();
         strongSelf->_operationQueue = queue;
     });

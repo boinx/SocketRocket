@@ -346,7 +346,9 @@ NSString *const SRHTTPResponseErrorKey = @"HTTPResponseStatusCode";
             __weak typeof(self) weakself = self;
             dispatch_async(_workQueue, ^{
                 typeof(self) strongSelf = weakself;
-                [strongSelf didConnect];
+				if (strongSelf == nil) { return; }
+
+				[strongSelf didConnect];
             });
         }
     }
@@ -425,7 +427,8 @@ NSString *const SRHTTPResponseErrorKey = @"HTTPResponseStatusCode";
     __weak typeof(self) weakself = self;
     [self _readUntilHeaderCompleteWithCallback:^(SRWebSocket *socket,  NSData *data) {
         typeof(self) strongSelf = weakself;
-        
+		if (strongSelf == nil) { return; }
+
         CFHTTPMessageRef receivedHTTPHeaders = strongSelf->_receivedHTTPHeaders;
         CFHTTPMessageAppendBytes(receivedHTTPHeaders, (const UInt8 *)data.bytes, data.length);
 
@@ -547,7 +550,8 @@ NSString *const SRHTTPResponseErrorKey = @"HTTPResponseStatusCode";
     // Need to shunt this on the _callbackQueue first to see if they received any messages
     [self.delegateController performDelegateQueueBlock:^{
         typeof(self) strongSelf = weakself;
-        
+		if (strongSelf == nil) { return; }
+
         __weak typeof(self) weakself_ = strongSelf;
         [strongSelf closeWithCode:SRStatusCodeProtocolError reason:message];
         dispatch_async(strongSelf->_workQueue, ^{
@@ -562,7 +566,9 @@ NSString *const SRHTTPResponseErrorKey = @"HTTPResponseStatusCode";
     __weak typeof(self) weakself = self;
     dispatch_async(_workQueue, ^{
         typeof(self) strongSelf = weakself;
-        if (strongSelf.readyState != SR_CLOSED) {
+		if (strongSelf == nil) { return; }
+
+		if (strongSelf.readyState != SR_CLOSED) {
             strongSelf->_failed = YES;
             __weak typeof(self) weakself_ = self;
             [strongSelf.delegateController performDelegateBlock:^(id<SRWebSocketDelegate>  _Nullable delegate, SRDelegateAvailableMethods availableMethods) {
@@ -680,7 +686,9 @@ NSString *const SRHTTPResponseErrorKey = @"HTTPResponseStatusCode";
     // Need to pingpong this off _callbackQueue first to make sure messages happen in order
     [self.delegateController performDelegateBlock:^(id<SRWebSocketDelegate> _Nullable delegate, SRDelegateAvailableMethods availableMethods) {
         typeof(self) strongSelf = weakself;
-        if (availableMethods.didReceivePing) {
+		if (strongSelf == nil) { return; }
+
+		if (availableMethods.didReceivePing) {
             [delegate webSocket:strongSelf didReceivePingWithData:data];
         }
         typeof(self) weakself_ = strongSelf;
@@ -1040,7 +1048,9 @@ static const uint8_t SRPayloadLenMask   = 0x7F;
     __weak typeof(self) weakself = self;
     dispatch_async(_workQueue, ^{
         typeof(self) strongSelf = weakself;
-        // Don't reset the length, since Apple doesn't guarantee that this will free the memory (and in tests on
+		if (strongSelf == nil) { return; }
+
+		// Don't reset the length, since Apple doesn't guarantee that this will free the memory (and in tests on
         // some platforms, it doesn't seem to, effectively causing a leak the size of the biggest frame so far).
         strongSelf->_currentFrameData = [[NSMutableData alloc] init];
 
@@ -1110,7 +1120,9 @@ static const uint8_t SRPayloadLenMask   = 0x7F;
             __weak typeof(self) weakself = self;
             [self.delegateController performDelegateBlock:^(id<SRWebSocketDelegate>  _Nullable delegate, SRDelegateAvailableMethods availableMethods) {
                 typeof(self) strongSelf = weakself;
-                if (availableMethods.didCloseWithCode) {
+				if (strongSelf == nil) { return; }
+
+				if (availableMethods.didCloseWithCode) {
                     [delegate webSocket:strongSelf didCloseWithCode:strongSelf->_closeCode reason:strongSelf->_closeReason wasClean:YES];
                 }
             }];
@@ -1175,7 +1187,9 @@ static const uint8_t SRPayloadLenMask   = 0x7F;
     __weak typeof(self) weakself = self;
     dispatch_async(_workQueue, ^{
         typeof(self) strongSelf = weakself;
-        strongSelf->_selfRetain = nil;
+		if (strongSelf == nil) { return; }
+
+		strongSelf->_selfRetain = nil;
     });
 }
 
@@ -1484,7 +1498,9 @@ static const size_t SRFrameHeaderOverhead = 32;
                 __weak typeof(self) weakself = self;
                 dispatch_async(_workQueue, ^{
                     typeof(self) strongSelf = weakself;
-                    if (strongSelf.readyState != SR_CLOSED) {
+					if (strongSelf == nil) { return; }
+
+					if (strongSelf.readyState != SR_CLOSED) {
                         strongSelf.readyState = SR_CLOSED;
                         [strongSelf _scheduleCleanup];
                     }
